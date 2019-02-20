@@ -25,7 +25,7 @@ public class FindMaxCategory
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException
 		{
 			String[] attributeArray = value.toString().split("\t");// 对字符串进行切分
-			if (attributeArray.length > 5)  // 忽略属性值少于5的 错误数据  
+			if (attributeArray.length > 5)  // 忽略属性值少于5的错误数据  
 			{
 				category.set(attributeArray[3]);
 				context.write(category, one);
@@ -44,7 +44,6 @@ public class FindMaxCategory
 				sum += val.get();
 
 			}
-
 			context.write(key, new IntWritable(sum));
 		}
 	}
