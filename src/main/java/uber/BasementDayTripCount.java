@@ -12,13 +12,9 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-import word.WordCount;
-import word.WordCount.IntSumReducer;
-import word.WordCount.TokenizerMapper;
 
 public class BasementDayTripCount
 {
@@ -34,7 +30,7 @@ public class BasementDayTripCount
 		{
 			String[] splitArray = value.toString().split(","); // 对字符串进行切分
 			specifyDate = splitArray[1];
-			
+			// 使用try来处理不和谐的数据
 			try{
 				date = LocalDate.parse(specifyDate,formatter);
 				dayOfWeek = date.getDayOfWeek().toString();
@@ -48,6 +44,22 @@ public class BasementDayTripCount
 			context.write(new Text(splitArray[0] + "+" + dayOfWeek), tripNum);
 		}
 	}
+	
+	public static class SumReducer extends Reducer<Text, IntWritable, Text, IntWritable>
+	{
+		public void reduce(Text key, Iterable<IntWritable> values, Context context)
+				throws IOException, InterruptedException
+		{
+			int sum = 0;
+			for (IntWritable val : values)
+			{
+				sum += val.get();
+
+			}
+			context.write(key, new IntWritable(sum));
+		}
+	}
+	
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -66,8 +78,8 @@ public class BasementDayTripCount
 		Job job = new Job(conf, "Basement Day Trip Count");
 		job.setJarByClass(BasementDayTripCount.class);
 		job.setMapperClass(ExtractTripMapper.class);
-//		job.setCombinerClass(IntSumReducer.class);
-//		job.setReducerClass(IntSumReducer.class);
+		job.setCombinerClass(SumReducer.class);
+		job.setReducerClass(SumReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
 		FileInputFormat.setInputDirRecursive(job, true);
