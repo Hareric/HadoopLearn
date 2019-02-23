@@ -128,10 +128,10 @@ public class FindMaxCategory
 		conf.addResource("classpath:/hadoop/core-site.xml");
 		conf.addResource("classpath:/hadoop/hdfs-site.xml");
 		conf.addResource("classpath:/hadoop/mapred-site.xml");
-		conf.setInt("N", 5);
+		conf.setInt("N", 15);
 		// String[] otherArgs = new GenericOptionsParser(conf,
 		// args).getRemainingArgs();
-		String[] otherArgs = { "/youtube", "/youtube_category_Top5" };
+		String[] otherArgs = { "/youtube", "/youtube_category_Top15" };
 		if (otherArgs.length != 2)
 		{
 			System.err.println("Usage: wordcount <in> <out>");
